@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubnetMaster – Anleitung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.page-hero { padding: 48px 20px 40px; max-width: 860px; margin: 0 auto; border-bottom: 1px solid var(--border2); }
+.page-hero h1 { font-size: clamp(24px,4.5vw,38px); font-weight:600; margin-bottom:10px; }
+.page-hero p  { font-size:15px; color:var(--text2); max-width:540px; line-height:1.75; }
+
+.solved-example {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--radius-lg); overflow:hidden; margin:20px 0;
+}
+.solved-header {
+  background:var(--bg3); padding:12px 18px;
+  border-bottom:1px solid var(--border2);
+  font-family:var(--mono); font-size:12px; color:var(--text3);
+  display:flex; align-items:center; gap:8px;
+}
+.solved-body { padding:18px; }
+.solved-row {
+  display:grid; grid-template-columns:24px 1fr auto;
+  gap:12px; align-items:center;
+  padding:9px 0; border-bottom:1px solid var(--border2);
+  font-size:13px;
+}
+.solved-row:last-child { border-bottom:none; }
+.solved-letter { font-family:var(--mono); font-weight:600; color:var(--accent); }
+.solved-q { color:var(--text2); }
+.solved-a { font-family:var(--mono); color:var(--green); font-weight:600; }
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">/28</div>
+      SubnetMaster
+    </a>
+    <div class="nav-links">
+      <a href="index.html" id="nav-trainer">Trainer</a>
+      <a href="lernen.html" id="nav-lernen">Lexikon</a>
+      <a href="anleitung.html" id="nav-anleitung" class="active">Anleitung</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <select class="lang-select" id="langSelect" onchange="changeLangPage(this.value)">
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇸🇦 العربية</option>
+      <option value="tr">🇹🇷 Türkçe</option>
+      <option value="fr">🇫🇷 Français</option>
+      <option value="es">🇪🇸 Español</option>
+    </select>
+    <button class="theme-btn" onclick="toggleTheme()">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div style="font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">📋 Schritt-für-Schritt Anleitung</div>
+  <h1>Wie löse ich eine Subnetting-Aufgabe?</h1>
+  <p>Hier findest du den kompletten Lösungsweg — von der Aufgabe bis zu allen 10 Antworten. Mit einem vollständig gelösten Beispiel.</p>
+</div>
+
+<div class="guide-wrap">
+
+  <div class="section-label">Der Lösungsweg</div>
+
+  <div class="guide-steps">
+
+    <!-- STEP 1 -->
+    <div class="guide-step open" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-title">Aufgabe lesen und Daten sammeln</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Lies die Aufgabe genau und notiere:</p>
+        <ul style="margin:8px 0 8px 20px">
+          <li>Das Ausgangsnetz (z.B. 192.168.50.0/24)</li>
+          <li>Wie viele Schulungsräume (SR) und wie viele PCs pro Raum</li>
+          <li>Verwaltungsnetz (VW) — wie viele PCs</li>
+          <li>Reservenetz (RS) — wie viele PCs</li>
+        </ul>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px 14px;margin-top:10px;font-size:13px;font-family:var(--mono);color:var(--text2)">
+          Beispiel: 8 SR (12 PCs), 1 VW (10 PCs), 1 RS (4 PCs)<br>
+          Netz: 192.168.50.0/24
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-title">a) IP-Klasse bestimmen</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Schau nur auf die erste Zahl der IP-Adresse:</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
+          <div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:10px 14px;font-size:13px;font-family:var(--mono)"><span style="color:#f97316">Klasse A</span>: 1 – 126</div>
+          <div style="background:rgba(227,179,65,0.1);border:1px solid rgba(227,179,65,0.3);border-radius:8px;padding:10px 14px;font-size:13px;font-family:var(--mono)"><span style="color:var(--yellow)">Klasse B</span>: 128 – 191</div>
+          <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:10px 14px;font-size:13px;font-family:var(--mono)"><span style="color:var(--green)">Klasse C</span>: 192 – 223</div>
+        </div>
+        <p>192.168.50.0 → erstes Byte = <strong style="color:var(--accent)">192</strong> → liegt zwischen 192–223 → <strong style="color:var(--green)">Klasse C</strong></p>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-title">b) Benötigte Subnetze berechnen</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Alle Subnetze zählen, dann auf die nächste 2er-Potenz aufrunden:</p>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:13px;font-family:var(--mono);line-height:2">
+          8 SR + 1 VW + 1 RS = <strong style="color:var(--accent)">10</strong> benötigt<br>
+          2er-Potenzen: 2, 4, 8, <strong style="color:var(--yellow)">16</strong>, 32 ...<br>
+          Nächste Potenz ≥ 10 → <strong style="color:var(--green)">16</strong>
+        </div>
+        <p style="font-size:13px;color:var(--text3)">Warum 2er-Potenz? Weil Bits nur 0 oder 1 sein können — man kann nicht 10 Subnetze mit ganzen Bits erzeugen, nur 8 oder 16.</p>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">4</div>
+        <div class="guide-step-title">c) Geborgene Bits bestimmen</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Frage: <em>2 hoch WAS ergibt die Subnetzzahl?</em></p>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:13px;font-family:var(--mono);line-height:2">
+          2^1=2, 2^2=4, 2^3=8, 2^<strong style="color:var(--accent)">4</strong>=16<br>
+          → Wir brauchen <strong style="color:var(--green)">4 Bits</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">5</div>
+        <div class="guide-step-title">d) Erforderliche Hostadressen</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Wie viele PCs hat das <strong>größte</strong> Subnetz? Das ist die Antwort.</p>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:13px;font-family:var(--mono)">
+          SR = 12 PCs, VW = 10 PCs, RS = 4 PCs<br>
+          Größtes = <strong style="color:var(--green)">12</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">6</div>
+        <div class="guide-step-title">e) Hostbits berechnen</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Das 4. Byte hat 8 Bits. Davon haben wir 4 Bits geborgt:</p>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:15px;font-family:var(--mono)">
+          8 − 4 = <strong style="color:var(--green)">4 Hostbits</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">7</div>
+        <div class="guide-step-title">f) Präfixlänge berechnen</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Ausgangsnetz /24 + geborgene Bits:</p>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:15px;font-family:var(--mono)">
+          /24 + 4 = <strong style="color:var(--green)">/28</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 8 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">8</div>
+        <div class="guide-step-title">g) Subnetzmaske berechnen</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <p>Bytes 1–3 bleiben 255. Im 4. Byte: 4 Einsen + 4 Nullen:</p>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:13px;font-family:var(--mono);line-height:2">
+          4. Byte binär: <strong style="color:var(--purple)">1111</strong> <strong style="color:var(--text3)">0000</strong><br>
+          Addieren: 128 + 64 + 32 + 16 = <strong style="color:var(--accent)">240</strong><br>
+          Maske: <strong style="color:var(--green)">255.255.255.240</strong>
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:6px">Stellenwerte merken:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <div style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--accent)">2⁷=128</div>
+            <div style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--accent)">2⁶=64</div>
+            <div style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--accent)">2⁵=32</div>
+            <div style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--accent)">2⁴=16</div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--text3)">2³=8</div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--text3)">2²=4</div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--text3)">2¹=2</div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--text3)">2⁰=1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 9 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">9</div>
+        <div class="guide-step-title">h & i) Adressen je Subnetz</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:13px;font-family:var(--mono);line-height:2">
+          h) Gesamt: 2^(Hostbits) = 2^4 = <strong style="color:var(--accent)">16</strong><br>
+          i) Nutzbar: 16 − 2 = <strong style="color:var(--green)">14</strong>
+        </div>
+        <p style="font-size:13px;color:var(--text3)">Die 2 abgezogenen Adressen: 1× Netzadresse (erste) + 1× Broadcast (letzte)</p>
+      </div>
+    </div>
+
+    <!-- STEP 10 -->
+    <div class="guide-step" onclick="toggleStep(this)">
+      <div class="guide-step-header">
+        <div class="guide-step-num">10</div>
+        <div class="guide-step-title">j) Theoretisch mögliche Netze</div>
+        <div class="guide-step-arrow">›</div>
+      </div>
+      <div class="guide-step-body">
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;margin:10px 0;font-size:13px;font-family:var(--mono);line-height:2">
+          2^(geborgene Bits) = 2^4 = <strong style="color:var(--green)">16</strong>
+        </div>
+        <p style="font-size:13px;color:var(--text3)">Gleich wie Frage b — die maximale Anzahl an Subnetzen die mit diesen Einstellungen möglich sind.</p>
+      </div>
+    </div>
+
+  </div><!-- end guide-steps -->
+
+  <!-- COMPLETE EXAMPLE -->
+  <div style="margin-top:48px;padding-top:36px;border-top:1px solid var(--border2)">
+    <div class="section-label">Vollständig gelöstes Beispiel</div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px;">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:12px">Aufgabe:</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        Netz: <code>192.168.50.0/24</code><br>
+        Benötigt: 8 Schulungsräume (je 12 PCs) · 1 Verwaltungsnetz (10 PCs) · 1 Reservenetz (4 PCs)
+      </div>
+    </div>
+
+    <div class="solved-example">
+      <div class="solved-header">
+        <div class="window-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        loesung_192_168_50_0.subnet
+      </div>
+      <div class="solved-body">
+        <div class="solved-row"><span class="solved-letter">a.</span><span class="solved-q">IP-Klasse</span><span class="solved-a">C</span></div>
+        <div class="solved-row"><span class="solved-letter">b.</span><span class="solved-q">Benötigte Subnetze</span><span class="solved-a">16</span></div>
+        <div class="solved-row"><span class="solved-letter">c.</span><span class="solved-q">Geborgene Bits</span><span class="solved-a">4</span></div>
+        <div class="solved-row"><span class="solved-letter">d.</span><span class="solved-q">Erf. Hostadressen</span><span class="solved-a">12</span></div>
+        <div class="solved-row"><span class="solved-letter">e.</span><span class="solved-q">Hostbits</span><span class="solved-a">4</span></div>
+        <div class="solved-row"><span class="solved-letter">f.</span><span class="solved-q">Präfixlänge</span><span class="solved-a">/28</span></div>
+        <div class="solved-row"><span class="solved-letter">g.</span><span class="solved-q">Subnetzmaske</span><span class="solved-a">255.255.255.240</span></div>
+        <div class="solved-row"><span class="solved-letter">h.</span><span class="solved-q">Adressen je Subnetz</span><span class="solved-a">16</span></div>
+        <div class="solved-row"><span class="solved-letter">i.</span><span class="solved-q">Nutzbare Hosts</span><span class="solved-a">14</span></div>
+        <div class="solved-row"><span class="solved-letter">j.</span><span class="solved-q">Theor. Netze</span><span class="solved-a">16</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
+      <a href="index.html" class="btn btn-primary">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+        Jetzt üben →
+      </a>
+      <a href="lernen.html" class="btn btn-secondary">
+        📚 Alles nochmal nachlesen
+      </a>
+    </div>
+  </div>
+
+</div><!-- end guide-wrap -->
+
+<footer>
+  <span id="footer-text">SubnetMaster — Klasse 1aAPC</span> &nbsp;·&nbsp;
+  <a href="index.html">Trainer</a> &nbsp;·&nbsp;
+  <a href="https://github.com" target="_blank">GitHub</a>
+</footer>
+
+<script src="js/lang.js"></script>
+<script>
+(function(){
+  const t = localStorage.getItem('sm-theme') || 'dark';
+  document.body.setAttribute('data-theme', t);
+  const sel = document.getElementById('langSelect');
+  if (sel) sel.value = currentLang;
+  const L = getLang();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('nav-trainer',  L.nav.trainer);
+  set('nav-lernen',   L.nav.lernen);
+  set('nav-anleitung',L.nav.anleitung);
+  set('footer-text',  L.footerText);
+})();
+
+function toggleTheme(){
+  const isDark = document.body.getAttribute('data-theme')==='dark';
+  document.body.setAttribute('data-theme', isDark?'light':'dark');
+  localStorage.setItem('sm-theme', isDark?'light':'dark');
+}
+
+function changeLangPage(lang){
+  setLang(lang);
+  const L=getLang();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('nav-trainer',  L.nav.trainer);
+  set('nav-lernen',   L.nav.lernen);
+  set('nav-anleitung',L.nav.anleitung);
+  set('footer-text',  L.footerText);
+}
+
+function toggleStep(el){
+  el.classList.toggle('open');
+}
+</script>
+</body>
+</html>

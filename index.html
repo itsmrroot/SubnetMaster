@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubnetMaster – Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">/28</div>
+      SubnetMaster
+    </a>
+    <div class="nav-links">
+      <a href="index.html" id="nav-trainer" class="active">Trainer</a>
+      <a href="lernen.html" id="nav-lernen">Lexikon</a>
+      <a href="anleitung.html" id="nav-anleitung">Anleitung</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <select class="lang-select" id="langSelect" onchange="changeLang(this.value)">
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇸🇦 العربية</option>
+      <option value="tr">🇹🇷 Türkçe</option>
+      <option value="fr">🇫🇷 Français</option>
+      <option value="es">🇪🇸 Español</option>
+    </select>
+    <button class="theme-btn" onclick="toggleTheme()">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-eyebrow" id="h-eyebrow">Subnetting Trainer</div>
+  <h1>
+    <span id="h-title-main">Subnetze rechnen</span><br>
+    <span id="h-span">ohne Fehler.</span>
+  </h1>
+  <p id="h-sub">Übe Subnetting mit zufällig generierten Aufgaben. Bei jedem Fehler siehst du eine Schritt-für-Schritt Erklärung.</p>
+  <a href="#trainer" class="btn btn-primary btn-lg">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+    <span id="h-cta-text">Aufgabe starten</span>
+  </a>
+  <div class="ip-grid">
+    <div class="ip-octet" id="o1">192</div><div class="ip-sep">.</div>
+    <div class="ip-octet" id="o2">168</div><div class="ip-sep">.</div>
+    <div class="ip-octet" id="o3">50</div><div class="ip-sep">.</div>
+    <div class="ip-octet" id="o4">0</div>
+    <div class="ip-sep" style="margin-left:4px">/</div>
+    <div class="ip-octet lit">24</div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-strip">
+  <div class="stat-cell"><span class="stat-value" id="stat-done">0</span><div class="stat-label" id="sl-done">Aufgaben gelöst</div></div>
+  <div class="stat-cell"><span class="stat-value" id="stat-correct">0</span><div class="stat-label" id="sl-correct">Richtige Antworten</div></div>
+  <div class="stat-cell"><span class="stat-value" id="stat-pct">–</span><div class="stat-label" id="sl-pct">Trefferquote</div></div>
+  <div class="stat-cell"><span class="stat-value" id="stat-streak">0</span><div class="stat-label" id="sl-streak">Aktuelle Serie</div></div>
+</div>
+
+<!-- ── TRAINER ── -->
+<main class="trainer-wrap" id="trainer">
+
+  <div class="section-label" id="lbl-task">Aktuelle Aufgabe</div>
+
+  <!-- Task card -->
+  <div class="task-card">
+    <div class="card-header">
+      <div class="window-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--text3)" id="task-title">aufgabe.subnet</span>
+      <button class="btn btn-secondary" onclick="newTask()" style="padding:5px 11px;font-size:12px;">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+        <span id="btn-new-text">Neue Aufgabe</span>
+      </button>
+    </div>
+    <div class="task-body">
+      <div class="info-group">
+        <div class="info-label" id="lbl-network">Netzwerk</div>
+        <div class="info-value"><span id="tn-net">–</span>/24</div>
+        <div class="info-value" id="tn-mask">Subnetzmaske: <span>255.255.255.0</span></div>
+        <div class="info-value" id="tn-hosts">Verfügbare Hosts: <span>254</span></div>
+      </div>
+      <div class="info-group">
+        <div class="info-label" id="lbl-needed">Benötigt</div>
+        <ul class="need-list" id="need-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="section-label" id="lbl-questions">Fragen beantworten</div>
+  <div class="questions-wrap" id="questions"></div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="checkAnswers()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      <span id="btn-check-text">Antworten prüfen</span>
+    </button>
+    <button class="btn btn-secondary" onclick="newTask()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+      <span id="btn-new-bottom-text">Neue Aufgabe</span>
+    </button>
+  </div>
+
+  <div class="score-bar" id="score-bar"></div>
+  <div class="solution-table" id="solution-table">
+    <div class="sol-header" id="sol-header">Alle richtigen Antworten</div>
+    <div class="sol-grid" id="sol-grid"></div>
+  </div>
+
+  <!-- How it works -->
+  <div style="margin-top:48px;padding-top:36px;border-top:1px solid var(--border2)">
+    <div class="section-label">So funktioniert es</div>
+    <div class="how-grid" id="how-grid"></div>
+  </div>
+
+</main>
+
+<footer>
+  <span id="footer-text">SubnetMaster — Klasse 1aAPC</span> &nbsp;·&nbsp;
+  <a href="lernen.html">Lexikon</a> &nbsp;·&nbsp;
+  <a href="https://github.com" target="_blank">GitHub</a>
+</footer>
+
+<script src="js/lang.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

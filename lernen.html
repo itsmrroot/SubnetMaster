@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubnetMaster – Subnetting Lexikon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ── Page-specific extras ── */
+.page-hero {
+  padding: 48px 20px 40px;
+  max-width: 960px; margin: 0 auto;
+  border-bottom: 1px solid var(--border2);
+}
+.page-hero h1 { font-size: clamp(24px,4.5vw,38px); font-weight:600; margin-bottom:10px; }
+.page-hero p  { font-size:15px; color:var(--text2); max-width:560px; line-height:1.75; }
+
+.octet-label {
+  font-size:11px; color:var(--text3); text-align:center;
+  font-family:var(--mono); margin-top:4px;
+}
+.arrow-right {
+  font-size:20px; color:var(--text3);
+  display:flex; align-items:center; padding:0 4px;
+}
+.legend {
+  display:flex; gap:16px; flex-wrap:wrap; margin:12px 0;
+}
+.legend-item {
+  display:flex; align-items:center; gap:6px;
+  font-size:12px; color:var(--text2);
+}
+.legend-dot {
+  width:10px; height:10px; border-radius:3px;
+}
+.ld-net    { background:rgba(88,166,255,0.5); }
+.ld-sub    { background:rgba(188,140,255,0.5); }
+.ld-host   { background:rgba(63,185,80,0.5); }
+
+/* Subnet table highlight */
+.hl { color:var(--accent); font-weight:600; }
+
+/* Class range badge */
+.range-badge {
+  font-family:var(--mono); font-size:12px;
+  padding:4px 10px; border-radius:20px;
+  display:inline-block;
+}
+.rb-a { background:rgba(249,115,22,0.12); color:#f97316; border:1px solid rgba(249,115,22,0.3); }
+.rb-b { background:rgba(227,179,65,0.12);  color:var(--yellow); border:1px solid rgba(227,179,65,0.3); }
+.rb-c { background:rgba(63,185,80,0.12);   color:var(--green);  border:1px solid rgba(63,185,80,0.3); }
+
+/* Interactive subnet calculator */
+.calc-wrap {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:20px; margin:20px 0;
+}
+.calc-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+.calc-label { font-size:13px; color:var(--text2); min-width:160px; }
+.calc-input {
+  font-family:var(--mono); font-size:14px;
+  background:var(--bg); border:1px solid var(--border);
+  color:var(--text); border-radius:6px; padding:7px 11px;
+  width:80px; outline:none;
+}
+.calc-input:focus { border-color:var(--accent2); }
+.calc-result {
+  background:var(--bg3); border:1px solid var(--border2);
+  border-radius:var(--radius-lg); padding:16px;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:12px; margin-top:14px;
+}
+.calc-res-cell { }
+.calc-res-key  { font-size:11px; color:var(--text3); text-transform:uppercase; margin-bottom:3px; }
+.calc-res-val  { font-family:var(--mono); font-size:14px; color:var(--accent); font-weight:600; }
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">/28</div>
+      SubnetMaster
+    </a>
+    <div class="nav-links">
+      <a href="index.html" id="nav-trainer">Trainer</a>
+      <a href="lernen.html" id="nav-lernen" class="active">Lexikon</a>
+      <a href="anleitung.html" id="nav-anleitung">Anleitung</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <select class="lang-select" id="langSelect" onchange="changeLangPage(this.value)">
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇸🇦 العربية</option>
+      <option value="tr">🇹🇷 Türkçe</option>
+      <option value="fr">🇫🇷 Français</option>
+      <option value="es">🇪🇸 Español</option>
+    </select>
+    <button class="theme-btn" onclick="toggleTheme()">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div style="font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">📚 Subnetting Lexikon</div>
+  <h1>Subnetting von Null an verstehen</h1>
+  <p>Hier lernst du alles — von IP-Adressen über Binärzahlen bis zum kompletten Subnetting. Mit Diagrammen, Beispielen und einem interaktiven Rechner.</p>
+</div>
+
+<div class="learn-wrap">
+  <div class="learn-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="learn-sidebar">
+      <nav class="sidebar-nav">
+        <a href="#s1" class="active"><span class="sidebar-num">01</span> Was ist eine IP-Adresse?</a>
+        <a href="#s2"><span class="sidebar-num">02</span> Binärzahlen</a>
+        <a href="#s3"><span class="sidebar-num">03</span> IP-Klassen</a>
+        <a href="#s4"><span class="sidebar-num">04</span> Was ist Subnetting?</a>
+        <a href="#s5"><span class="sidebar-num">05</span> Subnetzmaske</a>
+        <a href="#s6"><span class="sidebar-num">06</span> Bits borgen</a>
+        <a href="#s7"><span class="sidebar-num">07</span> Präfixlänge</a>
+        <a href="#s8"><span class="sidebar-num">08</span> Subnetz-Tabelle</a>
+        <a href="#s9"><span class="sidebar-num">09</span> Rechner</a>
+        <a href="#s10"><span class="sidebar-num">10</span> Schnell-Referenz</a>
+      </nav>
+    </aside>
+
+    <!-- ── CONTENT ── -->
+    <div>
+
+      <!-- ════ 01 IP-ADRESSE ════ -->
+      <section class="learn-section" id="s1">
+        <h2>01 — Was ist eine IP-Adresse?</h2>
+        <p class="learn-intro">Eine IP-Adresse ist wie eine Hausnummer im Internet — sie identifiziert eindeutig ein Gerät im Netzwerk.</p>
+
+        <p>IPv4-Adressen bestehen aus <strong>4 Bytes</strong> (= 4 × 8 Bits = 32 Bits), getrennt durch Punkte:</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            Aufbau einer IPv4-Adresse: 192.168.50.1
+          </div>
+          <div class="diagram-body">
+            <div class="byte-row">
+              <div class="byte-col"><div class="byte-box byte-net">192</div><div class="byte-label">1. Byte</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">168</div><div class="byte-label">2. Byte</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">50</div><div class="byte-label">3. Byte</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-host">1</div><div class="byte-label">4. Byte</div></div>
+            </div>
+            <div style="margin-top:14px">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Jedes Byte in Binär (8 Bits):</div>
+              <div class="bit-grid">
+                <div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div>
+                <div class="bit-cell bit-0">0</div><div class="bit-cell bit-0">0</div>
+                <div class="bit-cell bit-0">0</div><div class="bit-cell bit-0">0</div>
+                <div class="bit-cell bit-0">0</div><div class="bit-cell bit-0">0</div>
+                <div style="width:10px"></div>
+                <div class="bit-cell bit-1">1</div><div class="bit-cell bit-0">0</div>
+                <div class="bit-cell bit-1">1</div><div class="bit-cell bit-0">0</div>
+                <div class="bit-cell bit-1">1</div><div class="bit-cell bit-0">0</div>
+                <div class="bit-cell bit-0">0</div><div class="bit-cell bit-0">0</div>
+              </div>
+              <div style="font-size:12px;color:var(--text3);margin-top:4px;">128+64 = <span style="color:var(--accent)">192</span> &nbsp;&nbsp; 128+32+8 = <span style="color:var(--accent)">168</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box info-tip">
+          <div class="info-box-icon">💡</div>
+          <div>Ein Byte kann Werte von 0 bis 255 speichern (2⁸ = 256 Möglichkeiten). Deshalb sieht man in IP-Adressen nie eine Zahl über 255.</div>
+        </div>
+      </section>
+
+      <!-- ════ 02 BINÄR ════ -->
+      <section class="learn-section" id="s2">
+        <h2>02 — Binärzahlen verstehen</h2>
+        <p class="learn-intro">Computer kennen nur 0 und 1. Deshalb musst du für Subnetting verstehen, wie Binärzahlen funktionieren.</p>
+
+        <h3>Stellenwerte</h3>
+        <p>Jede Stelle hat einen Wert — eine 2er-Potenz. Von rechts nach links:</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">🔢 Stellenwerte eines Bytes (8 Bits)</div>
+          <div class="diagram-body">
+            <div class="bit-grid">
+              <div class="bit-cell bit-1" title="128">1</div>
+              <div class="bit-cell bit-1" title="64">1</div>
+              <div class="bit-cell bit-0" title="32">0</div>
+              <div class="bit-cell bit-1" title="16">1</div>
+              <div class="bit-cell bit-0" title="8">0</div>
+              <div class="bit-cell bit-0" title="4">0</div>
+              <div class="bit-cell bit-0" title="2">0</div>
+              <div class="bit-cell bit-0" title="1">0</div>
+            </div>
+            <div class="bit-grid" style="margin-top:4px">
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2⁷</div>
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2⁶</div>
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2⁵</div>
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2⁴</div>
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2³</div>
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2²</div>
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2¹</div>
+              <div style="width:34px;text-align:center;font-size:11px;color:var(--text3)">2⁰</div>
+            </div>
+            <div class="bit-grid" style="margin-top:4px">
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--accent);font-family:var(--mono)">128</div>
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--accent);font-family:var(--mono)">64</div>
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--text3);font-family:var(--mono)">32</div>
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--accent);font-family:var(--mono)">16</div>
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--text3);font-family:var(--mono)">8</div>
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--text3);font-family:var(--mono)">4</div>
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--text3);font-family:var(--mono)">2</div>
+              <div style="width:34px;text-align:center;font-size:12px;color:var(--text3);font-family:var(--mono)">1</div>
+            </div>
+            <div style="margin-top:12px;font-family:var(--mono);font-size:13px;color:var(--text2)">
+              Nur die 1er addieren: 128 + 64 + 16 = <span style="color:var(--green);font-weight:600">208</span>
+            </div>
+          </div>
+        </div>
+
+        <h3>Dezimal → Binär Tabelle</h3>
+        <div class="diagram-wrap">
+          <div class="diagram-body" style="padding:0">
+            <table class="learn-table">
+              <thead><tr><th>Dezimal</th><th>Binär</th><th>Erklärung</th></tr></thead>
+              <tbody>
+                <tr><td>128</td><td>1000 0000</td><td style="font-family:var(--sans);font-size:12px;color:var(--text2)">nur Bit 7</td></tr>
+                <tr><td>192</td><td>1100 0000</td><td style="font-family:var(--sans);font-size:12px;color:var(--text2)">128 + 64</td></tr>
+                <tr><td>224</td><td>1110 0000</td><td style="font-family:var(--sans);font-size:12px;color:var(--text2)">128 + 64 + 32</td></tr>
+                <tr><td>240</td><td>1111 0000</td><td style="font-family:var(--sans);font-size:12px;color:var(--text2)">128+64+32+16</td></tr>
+                <tr><td>248</td><td>1111 1000</td><td style="font-family:var(--sans);font-size:12px;color:var(--text2)">128+64+32+16+8</td></tr>
+                <tr><td>255</td><td>1111 1111</td><td style="font-family:var(--sans);font-size:12px;color:var(--text2)">alle Bits</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ 03 KLASSEN ════ -->
+      <section class="learn-section" id="s3">
+        <h2>03 — IP-Klassen</h2>
+        <p class="learn-intro">IPv4-Adressen sind in Klassen eingeteilt. Die Klasse bestimmt, wie groß das Netz ist.</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">🏷️ IP-Klassen Übersicht</div>
+          <div class="diagram-body" style="padding:0">
+            <table class="learn-table">
+              <thead><tr><th>Klasse</th><th>Erstes Byte</th><th>Bereich</th><th>Netze</th><th>Hosts/Netz</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="cls-a" style="font-weight:600">A</span></td>
+                  <td>0xxx xxxx</td>
+                  <td><span class="range-badge rb-a">1.0.0.0 – 126.255.255.255</span></td>
+                  <td>128</td>
+                  <td>16.777.214</td>
+                </tr>
+                <tr>
+                  <td><span class="cls-b" style="font-weight:600">B</span></td>
+                  <td>10xx xxxx</td>
+                  <td><span class="range-badge rb-b">128.0.0.0 – 191.255.255.255</span></td>
+                  <td>16.384</td>
+                  <td>65.534</td>
+                </tr>
+                <tr>
+                  <td><span class="cls-c" style="font-weight:600">C</span></td>
+                  <td>110x xxxx</td>
+                  <td><span class="range-badge rb-c">192.0.0.0 – 223.255.255.255</span></td>
+                  <td>2.097.152</td>
+                  <td>254</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="info-box info-good">
+          <div class="info-box-icon">✅</div>
+          <div><strong>Merkrege:</strong> Klasse C = 192–223 im ersten Byte. Das ist die häufigste Klasse in Schulaufgaben (z.B. 192.168.x.x).</div>
+        </div>
+
+        <h3>Visuell: Wie groß sind die Klassen?</h3>
+        <div style="margin:14px 0">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Klasse A — riesige Netze</div>
+          <div class="progress-track"><div class="progress-fill pf-blue" style="width:100%"></div></div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:10px;margin-top:2px">16 Millionen Hosts pro Netz</div>
+
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Klasse B — mittlere Netze</div>
+          <div class="progress-track"><div class="progress-fill pf-purple" style="width:40%"></div></div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:10px;margin-top:2px">65.534 Hosts pro Netz</div>
+
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Klasse C — kleine Netze ← wir arbeiten hier</div>
+          <div class="progress-track"><div class="progress-fill pf-green" style="width:5%"></div></div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">254 Hosts pro Netz</div>
+        </div>
+      </section>
+
+      <!-- ════ 04 SUBNETTING ════ -->
+      <section class="learn-section" id="s4">
+        <h2>04 — Was ist Subnetting?</h2>
+        <p class="learn-intro">Subnetting bedeutet: ein großes Netz in kleinere Teilnetze aufteilen — wie Wände in einem großen Haus einziehen.</p>
+
+        <p>Stell dir vor: Du hast ein Bürogebäude (= ein /24 Netz mit 254 Adressen). Du willst für jede Abteilung ein eigenes Netz — damit der Verkehr getrennt bleibt und du weißt, welches Gerät wo ist.</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">🏢 Ein /24 Netz wird aufgeteilt</div>
+          <div class="diagram-body">
+            <!-- Big network -->
+            <div style="background:rgba(31,111,235,0.06);border:1px solid rgba(88,166,255,0.25);border-radius:10px;padding:16px;margin-bottom:16px;">
+              <div style="font-size:12px;color:var(--accent);font-family:var(--mono);margin-bottom:10px;">192.168.50.0 /24 — 254 Hosts</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">
+                <div style="background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.3);border-radius:8px;padding:12px;text-align:center">
+                  <div style="font-size:11px;color:var(--purple);font-family:var(--mono)">Subnetz 1</div>
+                  <div style="font-size:12px;color:var(--text2);margin-top:4px">.0 – .15</div>
+                  <div style="font-size:11px;color:var(--text3)">14 nutzbare Hosts</div>
+                </div>
+                <div style="background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.3);border-radius:8px;padding:12px;text-align:center">
+                  <div style="font-size:11px;color:var(--purple);font-family:var(--mono)">Subnetz 2</div>
+                  <div style="font-size:12px;color:var(--text2);margin-top:4px">.16 – .31</div>
+                  <div style="font-size:11px;color:var(--text3)">14 nutzbare Hosts</div>
+                </div>
+                <div style="background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.3);border-radius:8px;padding:12px;text-align:center">
+                  <div style="font-size:11px;color:var(--purple);font-family:var(--mono)">Subnetz 3</div>
+                  <div style="font-size:12px;color:var(--text2);margin-top:4px">.32 – .47</div>
+                  <div style="font-size:11px;color:var(--text3)">14 nutzbare Hosts</div>
+                </div>
+                <div style="background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.3);border-radius:8px;padding:12px;text-align:center">
+                  <div style="font-size:11px;color:var(--purple);font-family:var(--mono)">... × 16</div>
+                  <div style="font-size:12px;color:var(--text3);margin-top:4px">usw.</div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--text2)">→ Aus einem /24 Netz entstehen durch Subnetting z.B. 16 kleinere /28 Netze.</div>
+          </div>
+        </div>
+
+        <h3>Warum Subnetting?</h3>
+        <div class="step-cards">
+          <div class="step-card"><div class="step-card-num">1</div><div class="step-card-body"><h4>Ordnung & Struktur</h4><p>Jede Abteilung/Raum bekommt ein eigenes Subnetz — klar getrennt und übersichtlich.</p></div></div>
+          <div class="step-card"><div class="step-card-num">2</div><div class="step-card-body"><h4>Sicherheit</h4><p>Subnetze können voneinander isoliert werden — z.B. darf das Büronetz nicht das Servernetz erreichen.</p></div></div>
+          <div class="step-card"><div class="step-card-num">3</div><div class="step-card-body"><h4>Weniger Broadcast-Traffic</h4><p>Broadcasts bleiben im Subnetz — das entlastet das gesamte Netz.</p></div></div>
+        </div>
+      </section>
+
+      <!-- ════ 05 SUBNETZMASKE ════ -->
+      <section class="learn-section" id="s5">
+        <h2>05 — Die Subnetzmaske</h2>
+        <p class="learn-intro">Die Subnetzmaske zeigt an, welcher Teil der IP-Adresse das <strong>Netz</strong> und welcher Teil der <strong>Host</strong> ist.</p>
+
+        <p>Regel: <code>1</code> = Netz-Teil &nbsp;|&nbsp; <code>0</code> = Host-Teil</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">🎭 Subnetzmaske 255.255.255.0 (/24)</div>
+          <div class="diagram-body">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:8px">IP-Adresse:</div>
+            <div class="byte-row">
+              <div class="byte-col"><div class="byte-box byte-net">192</div><div class="octet-label">Netz</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">168</div><div class="octet-label">Netz</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">50</div><div class="octet-label">Netz</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-host">1</div><div class="octet-label">Host</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin:12px 0 8px">Subnetzmaske:</div>
+            <div class="byte-row">
+              <div class="byte-col"><div class="byte-box byte-net">255</div><div class="octet-label">1111 1111</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">255</div><div class="octet-label">1111 1111</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">255</div><div class="octet-label">1111 1111</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-host">0</div><div class="octet-label">0000 0000</div></div>
+            </div>
+            <div style="margin-top:12px;font-size:13px;color:var(--text2)">
+              255 = alle Bits auf 1 → Netz-Teil &nbsp;|&nbsp; 0 = alle Bits auf 0 → Host-Teil
+            </div>
+          </div>
+        </div>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">🎭 Subnetzmaske 255.255.255.240 (/28)</div>
+          <div class="diagram-body">
+            <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Das 4. Byte ist jetzt gemischt — 4 Bits Netz, 4 Bits Host:</p>
+            <div class="byte-row">
+              <div class="byte-col"><div class="byte-box byte-net">255</div><div class="octet-label">1111 1111</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">255</div><div class="octet-label">1111 1111</div></div>
+              <div class="arrow-right">.</div>
+              <div class="byte-col"><div class="byte-box byte-net">255</div><div class="octet-label">1111 1111</div></div>
+              <div class="arrow-right">.</div>
+              <div style="display:flex;gap:3px">
+                <div class="byte-col">
+                  <div class="byte-box byte-sub" style="min-width:unset;padding:8px 10px">1111</div>
+                  <div class="octet-label">Netz</div>
+                </div>
+                <div class="byte-col">
+                  <div class="byte-box byte-host" style="min-width:unset;padding:8px 10px">0000</div>
+                  <div class="octet-label">Host</div>
+                </div>
+              </div>
+            </div>
+            <div class="formula" style="margin-top:16px">
+              <span class="formula-part">128+64+32+16</span>
+              <span class="formula-eq">=</span>
+              <span class="formula-result">240</span>
+              <span style="color:var(--text3);font-size:12px">→ 255.255.255.240</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ 06 BITS BORGEN ════ -->
+      <section class="learn-section" id="s6">
+        <h2>06 — Bits borgen</h2>
+        <p class="learn-intro">Subnetting funktioniert so: Man nimmt Bits vom Host-Teil und gibt sie dem Netz-Teil. Das erzeugt mehr, aber kleinere Subnetze.</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">🔄 Vorher /24 → Nachher /28 (4 Bits geborgt)</div>
+          <div class="diagram-body">
+            <div style="margin-bottom:16px">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:6px">VORHER — 4. Byte: alles Host-Bits</div>
+              <div class="bit-grid">
+                <div class="bit-cell bit-0">H</div><div class="bit-cell bit-0">H</div>
+                <div class="bit-cell bit-0">H</div><div class="bit-cell bit-0">H</div>
+                <div class="bit-cell bit-0">H</div><div class="bit-cell bit-0">H</div>
+                <div class="bit-cell bit-0">H</div><div class="bit-cell bit-0">H</div>
+              </div>
+              <div style="font-size:12px;color:var(--text3);margin-top:4px">8 Host-Bits → 2⁸−2 = 254 Hosts, 1 Netz</div>
+            </div>
+            <div style="font-size:20px;color:var(--text3);text-align:center;margin:8px 0">↓</div>
+            <div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:6px">NACHHER — 4 Bits für Subnetze geborgt</div>
+              <div class="bit-grid">
+                <div class="bit-cell bit-s">S</div><div class="bit-cell bit-s">S</div>
+                <div class="bit-cell bit-s">S</div><div class="bit-cell bit-s">S</div>
+                <div class="bit-cell bit-0">H</div><div class="bit-cell bit-0">H</div>
+                <div class="bit-cell bit-0">H</div><div class="bit-cell bit-0">H</div>
+              </div>
+              <div class="legend" style="margin-top:8px">
+                <div class="legend-item"><div class="legend-dot ld-sub"></div>S = Subnetz-Bit (geborgt)</div>
+                <div class="legend-item"><div class="legend-dot ld-host"></div>H = Host-Bit (bleibt)</div>
+              </div>
+              <div style="margin-top:8px;font-size:13px;color:var(--text2)">
+                4 Subnetz-Bits → 2⁴ = <strong style="color:var(--accent)">16 Subnetze</strong><br>
+                4 Host-Bits → 2⁴−2 = <strong style="color:var(--green)">14 nutzbare Hosts</strong> je Subnetz
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box info-warn">
+          <div class="info-box-icon">⚠️</div>
+          <div>Mehr geborgene Bits = mehr Subnetze, aber weniger Hosts pro Subnetz. Das ist immer ein Kompromiss!</div>
+        </div>
+
+        <h3>Die Formel</h3>
+        <div class="formula">
+          <span>Subnetze</span>
+          <span class="formula-eq">=</span>
+          <span class="formula-part">2^(geborgene Bits)</span>
+        </div>
+        <div class="formula">
+          <span>Hosts pro Subnetz</span>
+          <span class="formula-eq">=</span>
+          <span class="formula-part">2^(verbleibende Bits)</span>
+          <span class="formula-eq">−</span>
+          <span class="formula-result">2</span>
+          <span style="color:var(--text3);font-size:12px">(−Netz −Broadcast)</span>
+        </div>
+      </section>
+
+      <!-- ════ 07 PRÄFIX ════ -->
+      <section class="learn-section" id="s7">
+        <h2>07 — Präfixlänge (CIDR)</h2>
+        <p class="learn-intro">Die Präfixlänge (z.B. <code>/28</code>) ist eine kompakte Schreibweise für die Subnetzmaske — sie sagt, wie viele Bits das Netz-Teil hat.</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">📐 /28 = 28 Netz-Bits</div>
+          <div class="diagram-body">
+            <div style="display:flex;gap:3px;flex-wrap:wrap">
+              <!-- Byte 1: 8 x 1 (blau) -->
+              <div class="bit-cell bit-1" title="Byte 1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div>
+              <div style="width:8px"></div>
+              <!-- Byte 2: 8 x 1 -->
+              <div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div>
+              <div style="width:8px"></div>
+              <!-- Byte 3: 8 x 1 -->
+              <div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div><div class="bit-cell bit-1">1</div>
+              <div style="width:8px"></div>
+              <!-- Byte 4: 4 x 1 (sub), 4 x 0 (host) -->
+              <div class="bit-cell bit-s">1</div><div class="bit-cell bit-s">1</div><div class="bit-cell bit-s">1</div><div class="bit-cell bit-s">1</div>
+              <div class="bit-cell bit-0">0</div><div class="bit-cell bit-0">0</div><div class="bit-cell bit-0">0</div><div class="bit-cell bit-0">0</div>
+            </div>
+            <div style="margin-top:10px;font-size:13px;color:var(--text2)">
+              24 fixe Netz-Bits + <span style="color:var(--purple)">4 Subnetz-Bits</span> = <strong style="color:var(--accent)">/28</strong>
+              &nbsp;|&nbsp; 4 Host-Bits bleiben
+            </div>
+          </div>
+        </div>
+
+        <table class="learn-table" style="margin-top:16px">
+          <thead><tr><th>Präfix</th><th>Subnetzmaske</th><th>Geborgene Bits</th><th>Subnetze</th><th>Hosts/Subnetz</th><th>Blockgröße</th></tr></thead>
+          <tbody>
+            <tr><td>/25</td><td>255.255.255.128</td><td>1</td><td>2</td><td>126</td><td>128</td></tr>
+            <tr><td>/26</td><td>255.255.255.192</td><td>2</td><td>4</td><td>62</td><td>64</td></tr>
+            <tr><td>/27</td><td>255.255.255.224</td><td>3</td><td>8</td><td>30</td><td>32</td></tr>
+            <tr style="background:rgba(31,111,235,0.06)"><td class="hl">/28</td><td class="hl">255.255.255.240</td><td>4</td><td>16</td><td>14</td><td>16</td></tr>
+            <tr><td>/29</td><td>255.255.255.248</td><td>5</td><td>32</td><td>6</td><td>8</td></tr>
+            <tr><td>/30</td><td>255.255.255.252</td><td>6</td><td>64</td><td>2</td><td>4</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ════ 08 SUBNETZ-TABELLE ════ -->
+      <section class="learn-section" id="s8">
+        <h2>08 — Subnetz-Tabelle erstellen</h2>
+        <p class="learn-intro">Wenn du die Blockgröße weißt, kannst du alle Subnetze aufzählen. Blockgröße = Gesamtadressen pro Subnetz.</p>
+
+        <p>Beispiel: /28 → Blockgröße = 16. Subnetze beginnen bei 0, 16, 32, 48, ...</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-title">📋 Subnetz-Tabelle für 192.168.50.0/28</div>
+          <div class="diagram-body" style="padding:0">
+            <table class="learn-table">
+              <thead>
+                <tr>
+                  <th>Nr.</th>
+                  <th>Subnetz-ID</th>
+                  <th>Erster Host</th>
+                  <th>Letzter Host</th>
+                  <th>Broadcast</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>.0</td><td>.1</td><td>.14</td><td>.15</td></tr>
+                <tr><td>2</td><td>.16</td><td>.17</td><td>.30</td><td>.31</td></tr>
+                <tr><td>3</td><td>.32</td><td>.33</td><td>.46</td><td>.47</td></tr>
+                <tr><td>4</td><td>.48</td><td>.49</td><td>.62</td><td>.63</td></tr>
+                <tr style="color:var(--text3)"><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                <tr><td>16</td><td>.240</td><td>.241</td><td>.254</td><td>.255</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3>Merkhilfe für jedes Subnetz</h3>
+        <div class="step-cards">
+          <div class="step-card"><div class="step-card-num">①</div><div class="step-card-body"><h4>Subnetz-ID</h4><p>= Subnetz-Nummer × Blockgröße &nbsp;(0×16=0, 1×16=16, 2×16=32 ...)</p></div></div>
+          <div class="step-card"><div class="step-card-num">②</div><div class="step-card-body"><h4>Erster Host</h4><p>= Subnetz-ID + 1</p></div></div>
+          <div class="step-card"><div class="step-card-num">③</div><div class="step-card-body"><h4>Broadcast</h4><p>= Subnetz-ID + Blockgröße − 1 &nbsp;(0+16−1=15)</p></div></div>
+          <div class="step-card"><div class="step-card-num">④</div><div class="step-card-body"><h4>Letzter Host</h4><p>= Broadcast − 1</p></div></div>
+        </div>
+      </section>
+
+      <!-- ════ 09 RECHNER ════ -->
+      <section class="learn-section" id="s9">
+        <h2>09 — Interaktiver Subnetz-Rechner</h2>
+        <p>Gib die Anzahl der benötigten Subnetze ein — der Rechner berechnet alles automatisch.</p>
+
+        <div class="calc-wrap">
+          <div class="calc-row">
+            <span class="calc-label">Benötigte Subnetze:</span>
+            <input class="calc-input" type="number" id="calc-subnets" value="10" min="1" max="64" oninput="calcUpdate()">
+          </div>
+          <div class="calc-row">
+            <span class="calc-label">PCs im größten Subnetz:</span>
+            <input class="calc-input" type="number" id="calc-pcs" value="12" min="1" max="60" oninput="calcUpdate()">
+          </div>
+          <div class="calc-result" id="calc-result"></div>
+        </div>
+      </section>
+
+      <!-- ════ 10 SCHNELL-REFERENZ ════ -->
+      <section class="learn-section" id="s10">
+        <h2>10 — Schnell-Referenz</h2>
+
+        <h3>Die 10 Fragen im Überblick</h3>
+        <div class="diagram-wrap">
+          <div class="diagram-body" style="padding:0">
+            <table class="learn-table">
+              <thead><tr><th>#</th><th>Frage</th><th>Formel / Methode</th></tr></thead>
+              <tbody>
+                <tr><td>a</td><td>IP-Klasse</td><td style="font-family:var(--sans)">1. Byte: 1–126=A, 128–191=B, 192–223=C</td></tr>
+                <tr><td>b</td><td>Benötigte Subnetze</td><td style="font-family:var(--sans)">SR + VW + Reserve → nächste 2er-Potenz</td></tr>
+                <tr><td>c</td><td>Geborgene Bits</td><td>2^x = Subnetze → x = ?</td></tr>
+                <tr><td>d</td><td>Erf. Hostadressen</td><td style="font-family:var(--sans)">PCs im größten Raum</td></tr>
+                <tr><td>e</td><td>Hostbits</td><td>8 − geborgene Bits</td></tr>
+                <tr><td>f</td><td>Präfixlänge</td><td>/24 + geborgene Bits</td></tr>
+                <tr><td>g</td><td>Subnetzmaske</td><td style="font-family:var(--sans)">4. Byte: Einsen addieren (128+64+32+16=240)</td></tr>
+                <tr><td>h</td><td>Adressen/Subnetz</td><td>2^(Hostbits)</td></tr>
+                <tr><td>i</td><td>Nutzbare Hosts</td><td>Adressen/Subnetz − 2</td></tr>
+                <tr><td>j</td><td>Theor. Netze</td><td>2^(geborgene Bits)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="info-box info-good" style="margin-top:20px">
+          <div class="info-box-icon">🚀</div>
+          <div>Jetzt Trainer öffnen und üben! <a href="index.html" style="color:var(--accent)">→ Zum Trainer</a></div>
+        </div>
+      </section>
+
+    </div><!-- end content -->
+  </div><!-- end learn-layout -->
+</div><!-- end learn-wrap -->
+
+<footer>
+  <span id="footer-text">SubnetMaster — Klasse 1aAPC</span> &nbsp;·&nbsp;
+  <a href="index.html">Trainer</a> &nbsp;·&nbsp;
+  <a href="https://github.com" target="_blank">GitHub</a>
+</footer>
+
+<script src="js/lang.js"></script>
+<script>
+/* ── Apply saved theme ── */
+(function(){
+  const t = localStorage.getItem('sm-theme') || 'dark';
+  document.body.setAttribute('data-theme', t);
+  const sel = document.getElementById('langSelect');
+  if (sel) sel.value = currentLang;
+  // nav labels
+  const L = getLang();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('nav-trainer',  L.nav.trainer);
+  set('nav-lernen',   L.nav.lernen);
+  set('nav-anleitung',L.nav.anleitung);
+  set('footer-text',  L.footerText);
+})();
+
+function toggleTheme(){
+  const isDark = document.body.getAttribute('data-theme')==='dark';
+  document.body.setAttribute('data-theme', isDark?'light':'dark');
+  localStorage.setItem('sm-theme', isDark?'light':'dark');
+}
+
+function changeLangPage(lang){
+  setLang(lang);
+  const L=getLang();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('nav-trainer',  L.nav.trainer);
+  set('nav-lernen',   L.nav.lernen);
+  set('nav-anleitung',L.nav.anleitung);
+  set('footer-text',  L.footerText);
+}
+
+/* ── Sidebar active state ── */
+const sections = document.querySelectorAll('.learn-section');
+const navLinks  = document.querySelectorAll('.sidebar-nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(sec => {
+    if (window.scrollY >= sec.offsetTop - 100) current = sec.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#'+current);
+  });
+});
+
+/* ── Calculator ── */
+function calcUpdate() {
+  const subnets = parseInt(document.getElementById('calc-subnets').value) || 1;
+  const pcs     = parseInt(document.getElementById('calc-pcs').value) || 1;
+
+  function nextPow2(n){ let p=1; while(p<n) p*=2; return p; }
+  function bits(n){ return Math.round(Math.log2(n)); }
+  function maskByte(sb){ let v=0; for(let i=0;i<sb;i++) v+=Math.pow(2,7-i); return v; }
+
+  const subnetCount = nextPow2(subnets);
+  const subnetBits  = bits(subnetCount);
+  const hostBits    = 8 - subnetBits;
+  const total       = Math.pow(2, hostBits);
+  const usable      = total - 2;
+  const prefix      = 24 + subnetBits;
+  const mb          = maskByte(subnetBits);
+  const ok          = usable >= pcs;
+
+  document.getElementById('calc-result').innerHTML = `
+    <div class="calc-res-cell"><div class="calc-res-key">Subnetze (2er-Potenz)</div><div class="calc-res-val">${subnetCount}</div></div>
+    <div class="calc-res-cell"><div class="calc-res-key">Geborgene Bits</div><div class="calc-res-val">${subnetBits}</div></div>
+    <div class="calc-res-cell"><div class="calc-res-key">Host-Bits</div><div class="calc-res-val">${hostBits}</div></div>
+    <div class="calc-res-cell"><div class="calc-res-key">Präfixlänge</div><div class="calc-res-val">/${prefix}</div></div>
+    <div class="calc-res-cell"><div class="calc-res-key">Subnetzmaske</div><div class="calc-res-val">255.255.255.${mb}</div></div>
+    <div class="calc-res-cell"><div class="calc-res-key">Adressen/Subnetz</div><div class="calc-res-val">${total}</div></div>
+    <div class="calc-res-cell"><div class="calc-res-key">Nutzbare Hosts</div><div class="calc-res-val" style="color:${ok?'var(--green)':'var(--red)'}">${usable} ${ok?'✓':'← zu wenig!'}</div></div>
+    <div class="calc-res-cell"><div class="calc-res-key">Theor. Netze</div><div class="calc-res-val">${subnetCount}</div></div>
+  `;
+}
+calcUpdate();
+</script>
+</body>
+</html>
