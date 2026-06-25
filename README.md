@@ -8,7 +8,9 @@
 ![Languages](https://img.shields.io/badge/languages-6-orange)
 ![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)
 
-### 🔗 [https://itsmrroot.github.io/SubnetMaster/](https://itsmrroot.github.io/SubnetMaster/)
+[![Open Live Demo](https://img.shields.io/badge/Open%20Live%20Demo-itsmrroot.github.io/SubnetMaster-blue?style=for-the-badge&logo=github)](https://itsmrroot.github.io/SubnetMaster/)
+
+**🎉 Try the live demo now:** 👉 [itsmrroot.github.io/SubnetMaster/](https://itsmrroot.github.io/SubnetMaster/) — No install, runs entirely in your browser.
 
 ---
 
@@ -170,7 +172,7 @@ toBin8(sb)     // Binärdarstellung des 4. Bytes
 
 ### Aufgaben-Generierung
 
-Aufgaben werden aus **vorvalidierten Paaren** gezogen — so ist garantiert, dass die Anzahl der PCs immer in das berechnete Subnetz passt. Verhindert potenzielle Endlosrekursion bei ungültigen Kombinationen.
+Aufgaben werden aus **vorvalidierten Paaren** gezogen — so ist garantiert, dass die Anzahl der PCs immer in das berechnete Subnetz passt. Verhindert potenzielle Endlosrekursion bei ungültigen [...]
 
 ```
 25 valide (SR, PC)-Kombinationen
@@ -219,4 +221,3 @@ MIT License — frei verwendbar für Unterricht, Schule und private Projekte.
 ## 👨‍💻 Entwickelt für
 
 Klasse **1aAPC** · Schularbeit AMA · 17.06.2026
-
