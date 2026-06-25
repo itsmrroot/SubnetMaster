@@ -218,6 +218,3 @@ MIT License — frei verwendbar für Unterricht, Schule und private Projekte.
 
 Klasse **1aAPC** · Schularbeit AMA · 17.06.2026
 
----
-
-*Made with ❤️ and Claude AI*
