@@ -12,6 +12,27 @@
 /* ── State ── */
 let D = {};
 let totalDone = 0, totalCorrect = 0, totalAnswers = 0, streak = 0;
+let selectedClass = 'random'; // 'A' | 'B' | 'C' | 'random'
+
+/* ── Network options per class ── */
+const NET_OPTS = {
+  A: ['10.0.1','10.0.2','10.1.5','50.30.10','100.50.5','126.10.20'],
+  B: ['172.16.1','172.16.5','150.20.10','130.50.3','180.10.7','191.5.20'],
+  C: ['192.168.10','192.168.20','192.168.50','192.168.77','192.168.33','192.168.99'],
+};
+
+/* ── Class selector ── */
+function setClass(cls) {
+  selectedClass = cls;
+  ['cls-btn-r','cls-btn-a','cls-btn-b','cls-btn-c'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const map = { random:'cls-btn-r', A:'cls-btn-a', B:'cls-btn-b', C:'cls-btn-c' };
+  const btn = document.getElementById(map[cls]);
+  if (btn) btn.classList.add('active');
+  newTask();
+}
 
 /* ── Math helpers ── */
 function nextPow2(n) { let p = 1; while (p < n) p *= 2; return p; }
@@ -67,6 +88,13 @@ function applyHeroLang() {
   set('btn-new-text',        L.btnNew);
   set('btn-check-text',      L.btnCheck);
   set('btn-new-bottom-text', L.btnNew);
+  const trans = PAGE_TRANS[currentLang] || PAGE_TRANS['de'];
+  set('lbl-how',    trans['how-label']  || 'So funktioniert es');
+  set('cls-label',  trans['cls-label']  || 'IP-Klasse:');
+  set('cls-txt-r',  trans['cls-random'] || 'Zufällig');
+  set('cls-txt-a',  trans['cls-a']      || 'Klasse A');
+  set('cls-txt-b',  trans['cls-b']      || 'Klasse B');
+  set('cls-txt-c',  trans['cls-c']      || 'Klasse C');
 
   const howGrid = document.getElementById('how-grid');
   if (howGrid && L.how) {
@@ -109,8 +137,10 @@ function newTask() {
   const pcOpts  = [8, 10, 12, 14, 20, 25, 30];
   const vwOpts  = [5, 6, 8, 10];
   const rsOpts  = [2, 3, 4, 5];
-  const netOpts = ['192.168.10','192.168.20','192.168.50',
-                   '192.168.77','192.168.33','192.168.99'];
+  const cls     = selectedClass === 'random'
+    ? ['A','B','C'][Math.floor(Math.random() * 3)]
+    : selectedClass;
+  const netOpts = NET_OPTS[cls];
 
   /* FIX: build only valid (sr, pc) pairs first, then pick randomly */
   const validPairs = [];
@@ -150,9 +180,10 @@ function newTask() {
     sr, pcsPerSR, vw, rs, net, needed,
     subnetCount, subnetBits, hostBits,
     totalPerSub, usable, prefix, mask, mb, binStr, addParts,
+    cls,
     firstOctet: net.split('.')[0],
     answers: {
-      a: 'C',
+      a: cls,
       b: String(subnetCount),
       c: String(subnetBits),
       d: String(pcsPerSR),
@@ -217,14 +248,15 @@ function resetRow(id) {
   if (expl)  expl.style.display   = 'none';
 }
 
-/* ── Step explanations ── */
-function getSteps(id) {
-  const d = D;
-  const map = {
+/* ── Step explanations (language-aware) ── */
+const CLS_RANGE = { A:['1','126'], B:['128','191'], C:['192','223'] };
+
+const STEP_TRANS = {
+  de: (d) => { const r=CLS_RANGE[d.cls]; return ({
     a: [
       { t: `Erste Zahl der IP: <code>${d.firstOctet}</code>` },
       { t: `Klasse A = 1–126 &nbsp;|&nbsp; B = 128–191 &nbsp;|&nbsp; C = 192–223` },
-      { t: `${d.firstOctet} liegt zwischen 192 und 223 → <b>Klasse C</b>` }
+      { t: `${d.firstOctet} liegt zwischen ${r[0]} und ${r[1]} → <b>Klasse ${d.cls}</b>` }
     ],
     b: [
       { t: `${d.sr} SR + 1 VW + 1 RS = <code>${d.needed}</code> benötigt` },
@@ -266,8 +298,247 @@ function getSteps(id) {
       { t: `${d.subnetBits} Subnetzbits geborgt (Frage c)` },
       { t: `2^${d.subnetBits} = <b>${d.subnetCount} mögliche Netze</b>` }
     ]
-  };
-  return map[id] || [];
+  }); },
+  en: (d) => { const r=CLS_RANGE[d.cls]; return ({
+    a: [
+      { t: `First number of IP: <code>${d.firstOctet}</code>` },
+      { t: `Class A = 1–126 &nbsp;|&nbsp; B = 128–191 &nbsp;|&nbsp; C = 192–223` },
+      { t: `${d.firstOctet} is between ${r[0]} and ${r[1]} → <b>Class ${d.cls}</b>` }
+    ],
+    b: [
+      { t: `${d.sr} SR + 1 VW + 1 RS = <code>${d.needed}</code> required` },
+      { t: `Powers of 2: 2, 4, 8, 16, 32 ... → next ≥ ${d.needed}` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount}</b>` }
+    ],
+    c: [
+      { t: `2^? = ${d.subnetCount}` },
+      { t: `2^${d.subnetBits} = ${d.subnetCount} → borrow <b>${d.subnetBits} bits</b>` }
+    ],
+    d: [
+      { t: `Largest subnet = <code>${d.pcsPerSR} PCs</code> (training room)` },
+      { t: `Answer: <b>${d.pcsPerSR}</b>` }
+    ],
+    e: [
+      { t: `4th byte has 8 bits — ${d.subnetBits} borrowed (question c)` },
+      { t: `8 − ${d.subnetBits} = <b>${d.hostBits} host bits</b>` }
+    ],
+    f: [
+      { t: `Base network /24 + ${d.subnetBits} borrowed bits` },
+      { t: `24 + ${d.subnetBits} = <b>/${d.prefix}</b>` }
+    ],
+    g: [
+      { t: `Bytes 1–3 remain <code>255.255.255</code>` },
+      { t: `4th byte binary: <code>${d.binStr.slice(0,4)} ${d.binStr.slice(4)}</code>` },
+      { t: `Add ones: ${d.addParts} = <b>${d.mb}</b>` },
+      { t: `Subnet mask: <b>${d.mask}</b>` }
+    ],
+    h: [
+      { t: `${d.hostBits} host bits (question e)` },
+      { t: `2^${d.hostBits} = <b>${d.totalPerSub} addresses</b> per subnet` }
+    ],
+    i: [
+      { t: `${d.totalPerSub} addresses total (question h)` },
+      { t: `− 1 network address − 1 broadcast` },
+      { t: `${d.totalPerSub} − 2 = <b>${d.usable} usable hosts</b>` }
+    ],
+    j: [
+      { t: `${d.subnetBits} subnet bits borrowed (question c)` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount} possible networks</b>` }
+    ]
+  }); },
+  ar: (d) => { const r=CLS_RANGE[d.cls]; return ({
+    a: [
+      { t: `الرقم الأول في IP: <code>${d.firstOctet}</code>` },
+      { t: `الفئة A = 1–126 &nbsp;|&nbsp; B = 128–191 &nbsp;|&nbsp; C = 192–223` },
+      { t: `${d.firstOctet} يقع بين ${r[0]} و ${r[1]} → <b>الفئة ${d.cls}</b>` }
+    ],
+    b: [
+      { t: `${d.sr} SR + 1 VW + 1 RS = <code>${d.needed}</code> مطلوبة` },
+      { t: `قوى العدد 2: 2، 4، 8، 16، 32 ... → التالية ≥ ${d.needed}` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount}</b>` }
+    ],
+    c: [
+      { t: `2^? = ${d.subnetCount}` },
+      { t: `2^${d.subnetBits} = ${d.subnetCount} → استعر <b>${d.subnetBits} بت</b>` }
+    ],
+    d: [
+      { t: `أكبر شبكة = <code>${d.pcsPerSR} أجهزة</code> (غرفة التدريب)` },
+      { t: `الإجابة: <b>${d.pcsPerSR}</b>` }
+    ],
+    e: [
+      { t: `البايت الرابع له 8 بت — ${d.subnetBits} مستعارة (سؤال c)` },
+      { t: `8 − ${d.subnetBits} = <b>${d.hostBits} بتات مضيف</b>` }
+    ],
+    f: [
+      { t: `الشبكة الأساسية /24 + ${d.subnetBits} بتات مستعارة` },
+      { t: `24 + ${d.subnetBits} = <b>/${d.prefix}</b>` }
+    ],
+    g: [
+      { t: `البايتات 1–3 تبقى <code>255.255.255</code>` },
+      { t: `البايت الرابع ثنائياً: <code>${d.binStr.slice(0,4)} ${d.binStr.slice(4)}</code>` },
+      { t: `جمع الآحاد: ${d.addParts} = <b>${d.mb}</b>` },
+      { t: `قناع الشبكة: <b>${d.mask}</b>` }
+    ],
+    h: [
+      { t: `${d.hostBits} بتات مضيف (سؤال e)` },
+      { t: `2^${d.hostBits} = <b>${d.totalPerSub} عنوان</b> لكل شبكة` }
+    ],
+    i: [
+      { t: `${d.totalPerSub} عنوان إجمالاً (سؤال h)` },
+      { t: `− 1 عنوان شبكة − 1 عنوان بث` },
+      { t: `${d.totalPerSub} − 2 = <b>${d.usable} مضيف صالح</b>` }
+    ],
+    j: [
+      { t: `${d.subnetBits} بتات شبكة مستعارة (سؤال c)` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount} شبكة ممكنة</b>` }
+    ]
+  }); },
+  tr: (d) => { const r=CLS_RANGE[d.cls]; return ({
+    a: [
+      { t: `IP'nin ilk sayısı: <code>${d.firstOctet}</code>` },
+      { t: `A Sınıfı = 1–126 &nbsp;|&nbsp; B = 128–191 &nbsp;|&nbsp; C = 192–223` },
+      { t: `${d.firstOctet}, ${r[0]} ile ${r[1]} arasında → <b>${d.cls} Sınıfı</b>` }
+    ],
+    b: [
+      { t: `${d.sr} SR + 1 VW + 1 RS = <code>${d.needed}</code> gerekli` },
+      { t: `2'nin kuvvetleri: 2, 4, 8, 16, 32 ... → ≥ ${d.needed} olan bir sonraki` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount}</b>` }
+    ],
+    c: [
+      { t: `2^? = ${d.subnetCount}` },
+      { t: `2^${d.subnetBits} = ${d.subnetCount} → <b>${d.subnetBits} bit</b> ödünç al` }
+    ],
+    d: [
+      { t: `En büyük alt ağ = <code>${d.pcsPerSR} PC</code> (eğitim odası)` },
+      { t: `Cevap: <b>${d.pcsPerSR}</b>` }
+    ],
+    e: [
+      { t: `4. byte 8 bit — ${d.subnetBits} tanesi ödünç alındı (soru c)` },
+      { t: `8 − ${d.subnetBits} = <b>${d.hostBits} host biti</b>` }
+    ],
+    f: [
+      { t: `Temel ağ /24 + ${d.subnetBits} ödünç bit` },
+      { t: `24 + ${d.subnetBits} = <b>/${d.prefix}</b>` }
+    ],
+    g: [
+      { t: `1–3. byte <code>255.255.255</code> kalır` },
+      { t: `4. byte ikili: <code>${d.binStr.slice(0,4)} ${d.binStr.slice(4)}</code>` },
+      { t: `1'leri topla: ${d.addParts} = <b>${d.mb}</b>` },
+      { t: `Alt ağ maskesi: <b>${d.mask}</b>` }
+    ],
+    h: [
+      { t: `${d.hostBits} host biti (soru e)` },
+      { t: `2^${d.hostBits} = alt ağ başına <b>${d.totalPerSub} adres</b>` }
+    ],
+    i: [
+      { t: `${d.totalPerSub} adres toplam (soru h)` },
+      { t: `− 1 ağ adresi − 1 yayın adresi` },
+      { t: `${d.totalPerSub} − 2 = <b>${d.usable} kullanılabilir host</b>` }
+    ],
+    j: [
+      { t: `${d.subnetBits} alt ağ biti ödünç alındı (soru c)` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount} olası ağ</b>` }
+    ]
+  }); },
+  fr: (d) => { const r=CLS_RANGE[d.cls]; return ({
+    a: [
+      { t: `Premier nombre de l'IP : <code>${d.firstOctet}</code>` },
+      { t: `Classe A = 1–126 &nbsp;|&nbsp; B = 128–191 &nbsp;|&nbsp; C = 192–223` },
+      { t: `${d.firstOctet} est entre ${r[0]} et ${r[1]} → <b>Classe ${d.cls}</b>` }
+    ],
+    b: [
+      { t: `${d.sr} SR + 1 VW + 1 RS = <code>${d.needed}</code> requis` },
+      { t: `Puissances de 2 : 2, 4, 8, 16, 32 ... → prochaine ≥ ${d.needed}` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount}</b>` }
+    ],
+    c: [
+      { t: `2^? = ${d.subnetCount}` },
+      { t: `2^${d.subnetBits} = ${d.subnetCount} → emprunter <b>${d.subnetBits} bits</b>` }
+    ],
+    d: [
+      { t: `Plus grand sous-réseau = <code>${d.pcsPerSR} PC</code> (salle de formation)` },
+      { t: `Réponse : <b>${d.pcsPerSR}</b>` }
+    ],
+    e: [
+      { t: `Le 4e octet a 8 bits — ${d.subnetBits} empruntés (question c)` },
+      { t: `8 − ${d.subnetBits} = <b>${d.hostBits} bits hôte</b>` }
+    ],
+    f: [
+      { t: `Réseau de base /24 + ${d.subnetBits} bits empruntés` },
+      { t: `24 + ${d.subnetBits} = <b>/${d.prefix}</b>` }
+    ],
+    g: [
+      { t: `Octets 1–3 restent <code>255.255.255</code>` },
+      { t: `4e octet binaire : <code>${d.binStr.slice(0,4)} ${d.binStr.slice(4)}</code>` },
+      { t: `Additionner les 1 : ${d.addParts} = <b>${d.mb}</b>` },
+      { t: `Masque de sous-réseau : <b>${d.mask}</b>` }
+    ],
+    h: [
+      { t: `${d.hostBits} bits hôte (question e)` },
+      { t: `2^${d.hostBits} = <b>${d.totalPerSub} adresses</b> par sous-réseau` }
+    ],
+    i: [
+      { t: `${d.totalPerSub} adresses au total (question h)` },
+      { t: `− 1 adresse réseau − 1 broadcast` },
+      { t: `${d.totalPerSub} − 2 = <b>${d.usable} hôtes utilisables</b>` }
+    ],
+    j: [
+      { t: `${d.subnetBits} bits sous-réseau empruntés (question c)` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount} réseaux possibles</b>` }
+    ]
+  }); },
+  es: (d) => { const r=CLS_RANGE[d.cls]; return ({
+    a: [
+      { t: `Primer número de IP: <code>${d.firstOctet}</code>` },
+      { t: `Clase A = 1–126 &nbsp;|&nbsp; B = 128–191 &nbsp;|&nbsp; C = 192–223` },
+      { t: `${d.firstOctet} está entre ${r[0]} y ${r[1]} → <b>Clase ${d.cls}</b>` }
+    ],
+    b: [
+      { t: `${d.sr} SR + 1 VW + 1 RS = <code>${d.needed}</code> requeridas` },
+      { t: `Potencias de 2: 2, 4, 8, 16, 32 ... → siguiente ≥ ${d.needed}` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount}</b>` }
+    ],
+    c: [
+      { t: `2^? = ${d.subnetCount}` },
+      { t: `2^${d.subnetBits} = ${d.subnetCount} → prestar <b>${d.subnetBits} bits</b>` }
+    ],
+    d: [
+      { t: `Subred más grande = <code>${d.pcsPerSR} PCs</code> (aula de formación)` },
+      { t: `Respuesta: <b>${d.pcsPerSR}</b>` }
+    ],
+    e: [
+      { t: `El 4.º byte tiene 8 bits — ${d.subnetBits} prestados (pregunta c)` },
+      { t: `8 − ${d.subnetBits} = <b>${d.hostBits} bits de host</b>` }
+    ],
+    f: [
+      { t: `Red base /24 + ${d.subnetBits} bits prestados` },
+      { t: `24 + ${d.subnetBits} = <b>/${d.prefix}</b>` }
+    ],
+    g: [
+      { t: `Bytes 1–3 permanecen <code>255.255.255</code>` },
+      { t: `4.º byte binario: <code>${d.binStr.slice(0,4)} ${d.binStr.slice(4)}</code>` },
+      { t: `Sumar unos: ${d.addParts} = <b>${d.mb}</b>` },
+      { t: `Máscara de subred: <b>${d.mask}</b>` }
+    ],
+    h: [
+      { t: `${d.hostBits} bits de host (pregunta e)` },
+      { t: `2^${d.hostBits} = <b>${d.totalPerSub} direcciones</b> por subred` }
+    ],
+    i: [
+      { t: `${d.totalPerSub} direcciones en total (pregunta h)` },
+      { t: `− 1 dirección de red − 1 broadcast` },
+      { t: `${d.totalPerSub} − 2 = <b>${d.usable} hosts utilizables</b>` }
+    ],
+    j: [
+      { t: `${d.subnetBits} bits de subred prestados (pregunta c)` },
+      { t: `2^${d.subnetBits} = <b>${d.subnetCount} redes posibles</b>` }
+    ]
+  }); },
+};
+
+function getSteps(id) {
+  const fn = STEP_TRANS[currentLang] || STEP_TRANS['de'];
+  return (fn(D)[id]) || [];
 }
 
 /* ── Check answers ── */

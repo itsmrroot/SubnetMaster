@@ -9,6 +9,38 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<style>
+.class-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.class-sel-label {
+  font-size: 12px;
+  color: var(--text3);
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+.class-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.cls-btn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-size: 12px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.cls-btn:hover { border-color: var(--accent); color: var(--text); }
+.cls-btn.active                { background: var(--accent);  border-color: var(--accent);  color: #fff; }
+.cls-btn-a.active              { background: #f97316;         border-color: #f97316;         color: #fff; }
+.cls-btn-b.active              { background: var(--yellow);   border-color: var(--yellow);   color: #000; }
+.cls-btn-c.active              { background: var(--green);    border-color: var(--green);    color: #fff; }
+</style>
 </head>
 <body data-theme="dark">
 
@@ -76,6 +108,17 @@
 
   <div class="section-label" id="lbl-task">Aktuelle Aufgabe</div>
 
+  <!-- Class selector -->
+  <div class="class-selector">
+    <span class="class-sel-label" id="cls-label">IP-Klasse:</span>
+    <div class="class-btns">
+      <button id="cls-btn-r" class="cls-btn active" onclick="setClass('random')"><span id="cls-txt-r">Zufällig</span></button>
+      <button id="cls-btn-a" class="cls-btn cls-btn-a" onclick="setClass('A')"><span id="cls-txt-a">Klasse A</span></button>
+      <button id="cls-btn-b" class="cls-btn cls-btn-b" onclick="setClass('B')"><span id="cls-txt-b">Klasse B</span></button>
+      <button id="cls-btn-c" class="cls-btn cls-btn-c" onclick="setClass('C')"><span id="cls-txt-c">Klasse C</span></button>
+    </div>
+  </div>
+
   <!-- Task card -->
   <div class="task-card">
     <div class="card-header">
@@ -124,7 +167,7 @@
 
   <!-- How it works -->
   <div style="margin-top:48px;padding-top:36px;border-top:1px solid var(--border2)">
-    <div class="section-label">So funktioniert es</div>
+    <div class="section-label" id="lbl-how">So funktioniert es</div>
     <div class="how-grid" id="how-grid"></div>
   </div>
 
